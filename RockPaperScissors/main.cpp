@@ -7,8 +7,6 @@
 using namespace std;
 using namespace cv;
 
-
-
 float convexity(const vector<Point>& cont) {
 	vector<Point> hull;
 	convexHull(cont, hull, false, true);
@@ -66,6 +64,62 @@ void createHisto(const cv::Mat img, cv::Mat& histo) {
 	calcHist(kepek, csatornak, noArray(), histo, hiszto_meretek, hiszto_tartomanyok, false);
 }
 
+vector<cv::Point> preProcessing(Mat src, Mat& dest) {
+	Mat mask;
+	
+	resize(src, dest, Size(), 0.1, 0.1);
+
+	GaussianBlur(dest, dest, Size(5, 5), 0);
+	threshold(dest, mask, 45, 255, THRESH_BINARY);
+	Mat se = getStructuringElement(MORPH_ELLIPSE, Size(7, 7));
+
+	dilate(mask, mask, se);
+	//imshow("dilate",di);
+	cvtColor(mask, mask, COLOR_BGR2GRAY);
+	imshow("mask", mask);
+
+	vector<vector<cv::Point>> conts;
+	findContours(mask.clone(), conts, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+
+	assert(conts.size() == 1);
+
+	return conts[0];
+}
+
+Mat judge(const int thRound) {
+	vector<vector<cv::Point>> conts;
+
+	Mat rock = imread("game/starter/rock.jpg");
+	conts.push_back(preProcessing(rock, rock));
+
+	Mat paper = imread("game/starter/paper.jpg");
+	conts.push_back(preProcessing(paper, paper));
+
+	Mat scissor = imread("game/starter/scissor.jpg");
+	conts.push_back(preProcessing(scissor, scissor));
+
+	Mat player1 = imread("game/player1/" + to_string(thRound) + ".jpg");
+	conts.push_back(preProcessing(player1, player1));
+
+	Mat player2 = imread("game/player2/" + to_string(thRound) + ".jpg");
+	conts.push_back(preProcessing(player2, player2));
+
+	Mat data(5, 3, CV_32F);
+	for (int i = 0; i < 5; ++i) {
+
+		data.at<float>(i, 0) = circularity(conts[i]);
+		data.at<float>(i, 1) = convexity(conts[i]);
+		data.at<float>(i, 2) = cextent2(conts[i]);
+
+	}
+
+	TermCriteria crit(TermCriteria::Type::EPS | TermCriteria::Type::MAX_ITER, 100, 0.001);
+
+	Mat labels;
+	kmeans(data, 3, labels, crit, 3, KMEANS_RANDOM_CENTERS);
+
+	return labels;
+}
 
 int main() {
 	/*
@@ -93,13 +147,13 @@ int main() {
 	waitKey(0);
 	return 0;
 
-	*/
+	*//*
 	Mat mask;
 	Mat img;
 
 	Mat data(6, 3, CV_32F);  //18 minta; 3 jellemz�
 
-	for (int i = 1; i <= 6; ++i) {
+	for (int i = 1; i <= 7; ++i) {
 
 		resize(imread("game/" + to_string(i) + ".jpg"), img, Size(), 0.1, 0.1);
 
@@ -153,7 +207,17 @@ int main() {
 		resizeWindow(winname, Size(150, 150)); //csak hogy jobban kiferjen
 		moveWindow(winname, counters[lbl] * 150, lbl * 200);
 		counters[lbl]++;
+
 	}
-	waitKey(0);
+	waitKey(0);*/
+
+	Mat labels = judge(1);
+
+	for (int i = 0; i < 5; ++i) {
+		
+		cout << i << ".kép: " << labels.at<int>(i) << endl;
+
+	}
+
 	return 0;
 }
