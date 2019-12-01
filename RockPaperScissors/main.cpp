@@ -3,6 +3,12 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include <conio.h>
+
+#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
 
 using namespace std;
 using namespace cv;
@@ -76,7 +82,7 @@ vector<cv::Point> preProcessing(Mat src, Mat& dest) {
 	dilate(mask, mask, se);
 	//imshow("dilate",di);
 	cvtColor(mask, mask, COLOR_BGR2GRAY);
-	imshow("mask", mask);
+	//imshow("mask", mask);
 
 	vector<vector<cv::Point>> conts;
 	findContours(mask.clone(), conts, RETR_EXTERNAL, CHAIN_APPROX_NONE);
@@ -122,102 +128,139 @@ Mat judge(const int thRound) {
 }
 
 int main() {
-	/*
-	Mat img,mask;
-	vector<vector<Point> > contours;
-	resize(imread("black2.jpg"), img, Size(), 0.1, 0.1);
 
-	GaussianBlur(img, img, Size(5, 5), 0);
-	threshold(img, mask, 45, 255, THRESH_BINARY);
-	Mat se = getStructuringElement(MORPH_ELLIPSE,Size(7,7));
+	int korszam = 1;
 
-	dilate(mask, mask, se);
-	//imshow("dilate",di);
-	cvtColor(mask,mask,COLOR_BGR2GRAY);
-	imshow("mask",mask);
-
-	findContours(mask.clone(), contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE, Point(0, 0));
-	for (int i = 0; i < contours.size(); i++)
+	while (1)
 	{
-		Scalar color = Scalar(0, 255, 0);
-		drawContours(img, contours, i, color, 2);
-	}
-	imshow("img", img);
+		Mat labels = judge(korszam);
 
-	waitKey(0);
-	return 0;
+		cout << "A körök száma: " << korszam << endl;
 
-	*//*
-	Mat mask;
-	Mat img;
+		int player1 = labels.at<int>(3); //3 player 1, 4 player 2
+		int player2 = labels.at<int>(4);
 
-	Mat data(6, 3, CV_32F);  //18 minta; 3 jellemz�
-
-	for (int i = 1; i <= 7; ++i) {
-
-		resize(imread("game/" + to_string(i) + ".jpg"), img, Size(), 0.1, 0.1);
-
-		GaussianBlur(img, img, Size(5, 5), 0);
-		threshold(img, mask, 45, 255, THRESH_BINARY);
-		Mat se = getStructuringElement(MORPH_ELLIPSE, Size(7, 7));
-
-		dilate(mask, mask, se);
-		//imshow("dilate",di);
-		cvtColor(mask, mask, COLOR_BGR2GRAY);
-		imshow("mask", mask);
-
-		vector<vector<cv::Point>> conts;
-		findContours(mask.clone(), conts, RETR_EXTERNAL, CHAIN_APPROX_NONE);
-
-		assert(conts.size() == 1);
-
-		//ha t�bb jellemz�t akarsz, a data r�szt is �rd �t.
-		data.at<float>(i - 1, 0) = circularity(conts[0]);  //-1 a k�pek sorsz�moz�sa miatt
-		data.at<float>(i - 1, 1) = convexity(conts[0]);
-		data.at<float>(i - 1, 2) = cextent2(conts[0]);
-		//data.at<float>(i - 1, 0) = diameter(conts[0]);
-	}
-
-	cout << data << endl;
-
-	TermCriteria crit(TermCriteria::Type::EPS | TermCriteria::Type::MAX_ITER, 100, 0.001);
-	Mat labels;
-	kmeans(data, 3, labels, crit, 3, KMEANS_RANDOM_CENTERS);
-
-
-	//Egyszer� megjelen�t�s
-	//for (int i = 1; i <= 18; ++i) {
-	//	img = imread("../../kekszek_vegyes/" + to_string(i) + ".png", IMREAD_COLOR);
-	//	int lbl = labels.at<int>(i - 1);  //-1 csak a k�pek sorsz�moz�sa miatt
-	//	imshow(to_string(lbl), img);
-	//	waitKey(0);
-	//}
-
-
-	// Csoportba rendezett megjelen�t�s (most soronk�nt, hogy t�bb f�rjen)
-	int counters[] = { 0, 0, 0, };  //sz�moljuk, hogy mely csoportba h�ny mint�t pakol a g�p
-	for (int i = 1; i <= 7; ++i) {
-		img = imread("game/" + to_string(i) + ".jpg", IMREAD_COLOR);
-
-		int lbl = labels.at<int>(i - 1);  //-1 csak a k�pek sorsz�moz�sa miatt
-
-		string winname = to_string(lbl) + to_string(counters[lbl]);
-		namedWindow(winname, WINDOW_NORMAL);  //resize miatt
-		imshow(winname, img);
-		resizeWindow(winname, Size(150, 150)); //csak hogy jobban kiferjen
-		moveWindow(winname, counters[lbl] * 150, lbl * 200);
-		counters[lbl]++;
-
-	}
-	waitKey(0);*/
-
-	Mat labels = judge(1);
-
-	for (int i = 0; i < 5; ++i) {
+		if (player1 == player2)
+			cout << "Döntetlen." << endl;
 		
-		cout << i << ".kép: " << labels.at<int>(i) << endl;
+		bool p1 = false;
+		bool p2 = false;
+
+		switch (player1)
+		{
+			case 0:
+			{
+				if (player2 == 1)
+					p2 = true;
+				if (player2 == 2)
+					p1 = true;
+			}
+			case 1:
+			{
+				if (player2 == 0)
+					p1 = true;
+				if (player2 == 2)
+					p2 = true;
+			}
+			case 2:
+			{
+				if (player2 == 0)
+					p2 = true;
+				if (player2 == 1)
+					p1 = true;
+			}
+		}
+		/*
+		cout << player1 << endl;
+		cout << player2 << endl;
+		cout << p1 << endl;
+		cout << p2 << endl;
+		*/
+		Mat Mplayer1 = imread("game/player1/" + to_string(korszam) + ".jpg");
+		Mat Mplayer2 = imread("game/player2/" + to_string(korszam) + ".jpg");
+
+		Mat kep1_2;
+		Mat kep2_2;
+		resize(Mplayer1, kep1_2, Size(), 0.1, 0.1);
+		resize(Mplayer2, kep2_2, Size(), 0.1, 0.1);
+
+		if (p1 == true)
+		{
+			imshow("Player 1 - winner", kep1_2);
+			imshow("Player 2 - looser", kep2_2);
+			moveWindow("Player 1 - winner", 0, 0);
+			moveWindow("Player 2 - looser", 300, 0);
+		}
+		else if( p1 == false)
+		{
+			imshow("Player 1 - looser", kep1_2);
+			imshow("Player 2 - winner", kep2_2);
+			moveWindow("Player 1 - looser", 0, 0);
+			moveWindow("Player 2 - winner", 300, 0);
+		}
+
+		waitKey(1);
+
+		//0 kó 1 papír és 2 olló
+
+		string leptet = "";
+
+		cin >> leptet;
+
+		if (leptet == "j")
+		{
+			korszam += 1;
+		}
+		else if (leptet == "b")
+		{
+			if (korszam == 1)
+				cout << "Lejjebb nem lehet léptetni." << endl;
+			else
+				korszam = korszam - 1;
+		}
+		
+		if (p1 == true)
+		{
+			destroyWindow("Player 1 - winner");
+			destroyWindow("Player 2 - looser");
+		}
+		else if (p1 == false)
+		{
+			destroyWindow("Player 1 - looser");
+			destroyWindow("Player 2 - winner");
+		}
+
+		
 
 	}
+
+
+
+
+	/*int c = 0;
+	while (1)
+	{
+		c = 0;
+
+		switch ((c = _getch())) {
+		case KEY_UP:
+			cout << endl << "Up" << endl;//key up
+			break;
+		case KEY_DOWN:
+			cout << endl << "Down" << endl;   // key down
+			break;
+		case KEY_LEFT:
+			cout << endl << "Left" << endl;  // key left
+			break;
+		case KEY_RIGHT:
+			cout << endl << "Right" << endl;  // key right
+			break;
+		default:
+			cout << endl << "null" << endl;  // not arrow
+			break;
+		}
+
+	}*/
 
 	return 0;
 }
