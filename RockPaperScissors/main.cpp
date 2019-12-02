@@ -141,8 +141,8 @@ int main() {
 		int player1 = labels.at<int>(3); //3 player 1, 4 player 2
 		int player2 = labels.at<int>(4); //0 kó 1 papír és 2 olló
 
-		//cout << "Player 1 = " << player1 << endl;
-		//cout << "Player 2 = " << player2 << endl;
+		cout << "Player 1 = " << player1 << endl;
+		cout << "Player 2 = " << player2 << endl;
 
 		if (player1 == player2)
 			cout << "Draw." << endl;
