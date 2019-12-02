@@ -225,12 +225,12 @@ int main() {
 		else if (leptet == "e")
 			kilep = false;
 		
-		if (p1 == true)
+		if (p1 == true && !p2)
 		{
 			destroyWindow("Player 1 - winner");
 			destroyWindow("Player 2 - looser");
 		}
-		else if (p1 == false)
+		else if (p2 == true && !p1)
 		{
 			destroyWindow("Player 1 - looser");
 			destroyWindow("Player 2 - winner");
