@@ -138,55 +138,43 @@ int main() {
 
 		cout << "Number of turns: " << korszam << endl;
 
-		bool skipSW = false;
-
 		int player1 = labels.at<int>(3); //3 player 1, 4 player 2
-		int player2 = labels.at<int>(4);
+		int player2 = labels.at<int>(4); //0 kó 1 papír és 2 olló
 
-		cout << "Player 1 = " << player1 << endl;
-		cout << "Player 2 = " << player2 << endl;
+		//cout << "Player 1 = " << player1 << endl;
+		//cout << "Player 2 = " << player2 << endl;
 
 		if (player1 == player2)
-		{
 			cout << "Draw." << endl;
-			skipSW = true;
-		}
 			
-		
 		bool p1 = false;
 		bool p2 = false;
 
-		if(!skipSW)
-			switch (player1)
+		switch (player1)
+		{
+			case 0:
 			{
-				case 0:
-				{
-					if (player2 == 1)
-						p2 = true;
-					if (player2 == 2)
-						p1 = true;
-				}
-				case 1:
-				{
-					if (player2 == 0)
-						p1 = true;
-					if (player2 == 2)
-						p2 = true;
-				}
-				case 2:
-				{
-					if (player2 == 0)
-						p2 = true;
-					if (player2 == 1)
-						p1 = true;
-				}
+				if (player2 == 1)
+					p2 = true;
+				if (player2 == 2)
+					p1 = true;
 			}
-		/*
-		cout << player1 << endl;
-		cout << player2 << endl;
-		cout << p1 << endl;
-		cout << p2 << endl;
-		*/
+			case 1:
+			{
+				if (player2 == 0)
+					p1 = true;
+				if (player2 == 2)
+					p2 = true;
+			}
+			case 2:
+			{
+				if (player2 == 0)
+					p2 = true;
+				if (player2 == 1)
+					p1 = true;
+			}
+		}
+		
 		Mat Mplayer1 = imread("game/player1/" + to_string(korszam) + ".jpg");
 		Mat Mplayer2 = imread("game/player2/" + to_string(korszam) + ".jpg");
 
@@ -218,8 +206,6 @@ int main() {
 		}
 
 		waitKey(1);
-
-		//0 kó 1 papír és 2 olló
 
 		string leptet = "";
 
@@ -257,34 +243,6 @@ int main() {
 		
 
 	}
-
-
-
-
-	/*int c = 0;
-	while (1)
-	{
-		c = 0;
-
-		switch ((c = _getch())) {
-		case KEY_UP:
-			cout << endl << "Up" << endl;//key up
-			break;
-		case KEY_DOWN:
-			cout << endl << "Down" << endl;   // key down
-			break;
-		case KEY_LEFT:
-			cout << endl << "Left" << endl;  // key left
-			break;
-		case KEY_RIGHT:
-			cout << endl << "Right" << endl;  // key right
-			break;
-		default:
-			cout << endl << "null" << endl;  // not arrow
-			break;
-		}
-
-	}*/
 
 	return 0;
 }
