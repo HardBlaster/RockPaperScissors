@@ -130,46 +130,57 @@ Mat judge(const int thRound) {
 int main() {
 
 	int korszam = 1;
+	bool kilep = true;
 
-	while (1)
+	while (kilep)
 	{
 		Mat labels = judge(korszam);
 
-		cout << "A körök száma: " << korszam << endl;
+		cout << "Number of turns: " << korszam << endl;
+
+		bool skipSW = false;
 
 		int player1 = labels.at<int>(3); //3 player 1, 4 player 2
 		int player2 = labels.at<int>(4);
 
+		cout << "Player 1 = " << player1 << endl;
+		cout << "Player 2 = " << player2 << endl;
+
 		if (player1 == player2)
-			cout << "Döntetlen." << endl;
+		{
+			cout << "Draw." << endl;
+			skipSW = true;
+		}
+			
 		
 		bool p1 = false;
 		bool p2 = false;
 
-		switch (player1)
-		{
-			case 0:
+		if(!skipSW)
+			switch (player1)
 			{
-				if (player2 == 1)
-					p2 = true;
-				if (player2 == 2)
-					p1 = true;
+				case 0:
+				{
+					if (player2 == 1)
+						p2 = true;
+					if (player2 == 2)
+						p1 = true;
+				}
+				case 1:
+				{
+					if (player2 == 0)
+						p1 = true;
+					if (player2 == 2)
+						p2 = true;
+				}
+				case 2:
+				{
+					if (player2 == 0)
+						p2 = true;
+					if (player2 == 1)
+						p1 = true;
+				}
 			}
-			case 1:
-			{
-				if (player2 == 0)
-					p1 = true;
-				if (player2 == 2)
-					p2 = true;
-			}
-			case 2:
-			{
-				if (player2 == 0)
-					p2 = true;
-				if (player2 == 1)
-					p1 = true;
-			}
-		}
 		/*
 		cout << player1 << endl;
 		cout << player2 << endl;
@@ -184,19 +195,26 @@ int main() {
 		resize(Mplayer1, kep1_2, Size(), 0.1, 0.1);
 		resize(Mplayer2, kep2_2, Size(), 0.1, 0.1);
 
-		if (p1 == true)
+		if (p1 == true && !p2)
 		{
 			imshow("Player 1 - winner", kep1_2);
 			imshow("Player 2 - looser", kep2_2);
 			moveWindow("Player 1 - winner", 0, 0);
 			moveWindow("Player 2 - looser", 300, 0);
 		}
-		else if( p1 == false)
+		else if(p2 == true && !p1)
 		{
 			imshow("Player 1 - looser", kep1_2);
 			imshow("Player 2 - winner", kep2_2);
 			moveWindow("Player 1 - looser", 0, 0);
 			moveWindow("Player 2 - winner", 300, 0);
+		}
+		else if (!p2 && !p1)
+		{
+			imshow("Player 1 - Draw", kep1_2);
+			imshow("Player 2 - Draw", kep2_2);
+			moveWindow("Player 1 - Draw", 0, 0);
+			moveWindow("Player 2 - Draw", 300, 0);
 		}
 
 		waitKey(1);
@@ -218,6 +236,8 @@ int main() {
 			else
 				korszam = korszam - 1;
 		}
+		else if (leptet == "e")
+			kilep = false;
 		
 		if (p1 == true)
 		{
@@ -229,7 +249,11 @@ int main() {
 			destroyWindow("Player 1 - looser");
 			destroyWindow("Player 2 - winner");
 		}
-
+		else if (!p2 && !p1)
+		{
+			destroyWindow("Player 1 - Draw");
+			destroyWindow("Player 2 - Draw");
+		}
 		
 
 	}
